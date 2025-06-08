@@ -33,6 +33,9 @@ ENV MCPO_MANAGER_DATA_DIR=/data
 # Create data directory
 RUN mkdir -p /data
 
+# Create entrypoint script to handle environment variable expansion
+RUN echo '#!/bin/bash\nexec uv run python -m mcpo_control_panel --host "$MCPO_MANAGER_HOST" --port "$MCPO_MANAGER_PORT" --config-dir "$MCPO_MANAGER_DATA_DIR" "$@"' > /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
 # Command to run the application
-# The application will use the environment variables for host, port, and config directory
-CMD ["uv", "run", "python", "-m", "mcpo_control_panel", "--host", "${MCPO_MANAGER_HOST}", "--port", "${MCPO_MANAGER_PORT}", "--config-dir", "${MCPO_MANAGER_DATA_DIR}"]
+ENTRYPOINT ["/entrypoint.sh"]
